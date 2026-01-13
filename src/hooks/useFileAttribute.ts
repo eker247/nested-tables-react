@@ -28,9 +28,10 @@ export const useCreateFileAttribute = () => {
 
   return useMutation({
     mutationFn: (data: Partial<FileAttribute>) => fileAttributeApi.create(data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['fileAttributes'] });
-      queryClient.invalidateQueries({ queryKey: ['dataFile'] });
+      queryClient.invalidateQueries({ queryKey: ['dataFile', variables.dataFile?.id] });
+      queryClient.invalidateQueries({ queryKey: ['dataFolder', variables.dataFile?.dataFolder?.id] });
     },
   });
 };
@@ -54,10 +55,12 @@ export const useDeleteFileAttribute = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => fileAttributeApi.delete(id),
-    onSuccess: () => {
+    mutationFn: (variables: {attributeToDeleteId: number, folderId: number}) => fileAttributeApi.delete(variables.attributeToDeleteId),
+    onSuccess: (_, { folderId }) => {
       queryClient.invalidateQueries({ queryKey: ['fileAttributes'] });
       queryClient.invalidateQueries({ queryKey: ['dataFile'] });
+      queryClient.invalidateQueries({ queryKey: ['dataFolder', folderId] });
+      console.log('variables', folderId);
     },
   });
 };

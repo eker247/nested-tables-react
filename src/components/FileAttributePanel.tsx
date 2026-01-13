@@ -24,16 +24,16 @@ export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, 
       name: newAttrName,
       include: newAttrInclude,
       required: newAttrRequired,
-      dataFile: { id: fileId },
+      dataFile: { id: fileId, dataFolder: { id: folderId } },
     });
     setNewAttrName('');
     setNewAttrInclude(true);
     setNewAttrRequired(false);
   };
 
-  const handleDeleteAttribute = async (attrId: number) => {
+  const handleDeleteAttribute = async (attrId: number, folderId: number) => {
     if (window.confirm('Delete this attribute?')) {
-      await deleteAttrMutation.mutateAsync(attrId);
+      await deleteAttrMutation.mutateAsync({ attributeToDeleteId: attrId, folderId });
     }
   };
 
@@ -133,7 +133,7 @@ export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, 
                   </div>
                 </div>
                 <button
-                  onClick={() => handleDeleteAttribute(attr.id)}
+                  onClick={() => handleDeleteAttribute(attr.id, folderId)}
                   disabled={deleteAttrMutation.isPending}
                   className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs disabled:bg-gray-400"
                 >
