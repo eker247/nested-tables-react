@@ -44,7 +44,7 @@ export const useUpdateDataFile = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['dataFiles'] });
       queryClient.invalidateQueries({ queryKey: ['dataFile', variables.id] });
-      queryClient.invalidateQueries({ queryKey: ['dataFolder'] });
+      queryClient.invalidateQueries({ queryKey: ['dataFolder', variables.data.dataFolder?.id] });
     },
   });
 };

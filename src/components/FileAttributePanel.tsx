@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { FileAttribute } from '../types';
-import { useCreateFileAttribute, useDeleteFileAttribute } from '../hooks';
+import { useCreateFileAttribute, useDeleteFileAttribute, useUpdateFileAttribute } from '../hooks';
 
 interface FileAttributePanelProps {
   fileId: number;
   attributes: FileAttribute[] | undefined;
+  folderId: number;
 }
 
-export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, attributes }) => {
+export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, attributes, folderId }) => {
   const createAttrMutation = useCreateFileAttribute();
   const deleteAttrMutation = useDeleteFileAttribute();
+  const updateAttrMutation = useUpdateFileAttribute();
 
   const [newAttrName, setNewAttrName] = useState('');
   const [newAttrInclude, setNewAttrInclude] = useState(true);
@@ -20,7 +22,7 @@ export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, 
 
     await createAttrMutation.mutateAsync({
       name: newAttrName,
-      incude: newAttrInclude,
+      include: newAttrInclude,
       required: newAttrRequired,
       dataFile: { id: fileId },
     });
@@ -35,8 +37,19 @@ export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, 
     }
   };
 
+  const handleUpdateAttribute = async (attribute: FileAttribute) => {
+    await updateAttrMutation.mutateAsync({ id: attribute.id, data: { ...attribute, dataFile: { dataFolder: { id: folderId } } } });
+  };
+
+  const onIncludedChange = (included: boolean) => {
+    if (!included) {
+      setNewAttrRequired(false);
+    }
+    setNewAttrInclude(included);
+  };
+
   return (
-    <div className="border-t bg-gray-50 p-4 space-y-4" onContextMenu={(e) => console.log(fileId)}>
+    <div className="border-t bg-gray-50 p-4 space-y-4">
       {/* Add Attribute */}
       <div>
         <h4 className="font-semibold mb-2">Add Attribute</h4>
@@ -57,7 +70,7 @@ export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, 
               <input
                 type="checkbox"
                 checked={newAttrInclude}
-                onChange={(e) => setNewAttrInclude(e.target.checked)}
+                onChange={(e) => onIncludedChange(e.target.checked)}
                 className="mr-2"
               />
               Include
@@ -66,6 +79,7 @@ export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, 
               <input
                 type="checkbox"
                 checked={newAttrRequired}
+                disabled={!newAttrInclude}
                 onChange={(e) => setNewAttrRequired(e.target.checked)}
                 className="mr-2"
               />
@@ -74,7 +88,7 @@ export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, 
           </div>
           <button
             onClick={handleCreateAttribute}
-            disabled={createAttrMutation.isPending}
+            disabled={createAttrMutation.isPending || newAttrName.trim() === ''}
             className="w-full px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 text-sm"
           >
             Add Attribute
@@ -94,10 +108,29 @@ export const FileAttributePanel: React.FC<FileAttributePanelProps> = ({ fileId, 
               >
                 <div>
                   <p className="font-medium">{attr.name}</p>
-                  <p className="text-xs text-gray-600">
-                    {attr.incude ? '✓ Include' : '✗ Include'} |{' '}
-                    {attr.required ? '★ Required' : '☆ Optional'}
-                  </p>
+                  <div className="text-xs text-gray-600">
+                    <div className="flex gap-4">
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={attr.include}
+                          onChange={(e) => handleUpdateAttribute({ ...attr, include: e.target.checked })}
+                          className="mr-2"
+                        />
+                        Include
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={attr.required}
+                          disabled={!attr.include}
+                          onChange={(e) => handleUpdateAttribute({ ...attr, required: e.target.checked })}
+                          className="mr-2"
+                        />
+                        Required
+                      </label>
+                    </div>
+                  </div>
                 </div>
                 <button
                   onClick={() => handleDeleteAttribute(attr.id)}

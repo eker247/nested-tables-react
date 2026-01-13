@@ -52,6 +52,7 @@ export const FileListPanel: React.FC<FileListPanelProps> = ({ folderId, files })
         data: {
           name: editFileData.name,
           createDate: editFileData.createDate.toISOString(),
+          dataFolder: { id: folderId }
         },
       });
       setEditingFileId(null);
@@ -91,7 +92,7 @@ export const FileListPanel: React.FC<FileListPanelProps> = ({ folderId, files })
           </div>
           <button
             onClick={handleCreateFile}
-            disabled={createFileMutation.isPending}
+            disabled={createFileMutation.isPending || newFileName.trim() === '' || !newFileDate}
             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
           >
             Add File
@@ -199,7 +200,7 @@ export const FileListPanel: React.FC<FileListPanelProps> = ({ folderId, files })
 
               {/* File Attributes */}
               {expandedFileId === file.id && editingFileId !== file.id && (
-                <FileAttributePanel fileId={file.id} attributes={file.fileAttributes} />
+                <FileAttributePanel fileId={file.id} attributes={file.fileAttributes} folderId={folderId} />
               )}
             </div>
           ))

@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { DataFolderList, DataFolderEdit } from './components';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-
-const queryClient = new QueryClient();
+import { DataFolderPage } from './pages';
 
 function App() {
-  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
-
   return (
-    <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow">
           <div className="container py-6">
@@ -18,17 +13,12 @@ function App() {
         </header>
 
         <main className="container py-8">
-          {selectedFolderId ? (
-            <DataFolderEdit
-              folderId={selectedFolderId}
-              onBack={() => setSelectedFolderId(null)}
-            />
-          ) : (
-            <DataFolderList onSelect={setSelectedFolderId} />
-          )}
+          <Routes>
+            <Route path="/" element={<DataFolderPage />} />
+          </Routes>
         </main>
       </div>
-    </QueryClientProvider>
+    </BrowserRouter>
   );
 }
 

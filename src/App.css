@@ -36,3 +36,7 @@
     transform: rotate(360deg);
   }
 }
+
+.min-width-sm {
+  min-width: 30rem; /* 480px */
+}

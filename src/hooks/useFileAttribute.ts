@@ -44,7 +44,8 @@ export const useUpdateFileAttribute = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['fileAttributes'] });
       queryClient.invalidateQueries({ queryKey: ['fileAttribute', variables.id] });
-      queryClient.invalidateQueries({ queryKey: ['dataFile'] });
+      queryClient.invalidateQueries({ queryKey: ['dataFile', variables.data.dataFile?.id] });
+      queryClient.invalidateQueries({ queryKey: ['dataFolder', variables.data.dataFile?.dataFolder?.id] });
     },
   });
 };

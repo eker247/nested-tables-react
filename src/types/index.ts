@@ -18,7 +18,7 @@ export interface DataFile {
 export interface FileAttribute {
   id: number;
   name: string;
-  incude: boolean;
+  include: boolean;
   required: boolean;
   dataFileId?: number;
   dataFile?: Partial<DataFile>;
